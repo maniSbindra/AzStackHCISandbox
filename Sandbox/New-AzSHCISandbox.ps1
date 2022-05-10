@@ -1297,25 +1297,25 @@ function Set-AzSMGMT {
         Try {
 
             $AzSHOST1 = $SDNConfig.AzSHOST1IP.Split("/")[0]
-            $AzSHOST2 = $SDNConfig.AzSHOST2IP.Split("/")[0]
+            # $AzSHOST2 = $SDNConfig.AzSHOST2IP.Split("/")[0]
 
             Write-Verbose "Setting VMStorage Path for all Hosts"
           
             Invoke-Command -ComputerName $AzSHOST1 -ArgumentList $VMStoragePathforOtherHosts `
                 -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
                 -Credential $using:localCred -AsJob | Out-Null
-            Invoke-Command -ComputerName $AzSHOST2  -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
+            # Invoke-Command -ComputerName $AzSHOST2  -ArgumentList $VMStoragePathforOtherHosts `
+            #    -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
+            #    -Credential $using:localCred -AsJob | Out-Null
 
 
             # 2nd pass
             Invoke-Command -ComputerName $AzSHOST1 -ArgumentList $VMStoragePathforOtherHosts `
                 -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
                 -Credential $using:localCred -AsJob | Out-Null
-            Invoke-Command -ComputerName $AzSHOST2 -ArgumentList $VMStoragePathforOtherHosts `
-                -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
-                -Credential $using:localCred -AsJob | Out-Null
+            # Invoke-Command -ComputerName $AzSHOST2 -ArgumentList $VMStoragePathforOtherHosts `
+              #   -ScriptBlock { Set-VMHost -VirtualHardDiskPath $args[0] -VirtualMachinePath $args[0] } `
+               # -Credential $using:localCred -AsJob | Out-Null
 
         }
 
@@ -1329,9 +1329,9 @@ function Set-AzSMGMT {
 
         Try {
 
-            Write-Verbose "Adding SDN Hosts to the Domain"
-            AddAzSHOSTToDomain -IP $AzSHOST1 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST1 -SDNConfig $SDNConfig
-            AddAzSHOSTToDomain -IP $AzSHOST2 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST2 -SDNConfig $SDNConfig
+            # Write-Verbose "Adding SDN Hosts to the Domain"
+            # AddAzSHOSTToDomain -IP $AzSHOST1 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST1 -SDNConfig $SDNConfig
+            # AddAzSHOSTToDomain -IP $AzSHOST2 -localCred $using:localCred -domainCred $using:domainCred -AzSHOSTName AzSHOST2 -SDNConfig $SDNConfig
 
         }
 
@@ -3111,7 +3111,8 @@ function New-SDNS2DCluster {
             # Create S2D Cluster
 
             $SDNConfig = $args[0]
-            $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
+            # $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
+            $AzSHOSTs = @("AzSHOST1")
 
             Write-Verbose "Creating Cluster: AzStackCluster"
 
@@ -3738,7 +3739,8 @@ $params = @{
 
     SDNConfig          = $SDNConfig
     DomainCred         = $domainCred
-    AzStackClusterNode = 'AzSHOST2'
+    AzStackClusterNode = 'AzSHOST1'
+    # AzStackClusterNode = 'AzSHOST2'
 
 }
 
