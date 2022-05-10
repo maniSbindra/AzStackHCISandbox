@@ -666,23 +666,23 @@ $azsmgmtProdKey
     
         # Inject VMConfigs and create folder structure if host is AzSMGMT
 
-        if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
+        # if ($AzSHOST.AzSHOST -eq "AzSMGMT") {
 
             # Creating folder structure on AzSMGMT
 
-            Write-Verbose "Creating VMs\Base folder structure on AzSMGMT"
-            New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
+            # Write-Verbose "Creating VMs\Base folder structure on AzSMGMT"
+            # New-Item -Path ($MountedDrive + ":\VMs\Base") -ItemType Directory -Force | Out-Null
 
             Write-Verbose "Injecting VMConfigs to $path"
             Copy-Item -Path .\AzSHCISandbox-Config.psd1 -Destination ($MountedDrive + ":\") -Recurse -Force
             New-Item -Path ($MountedDrive + ":\") -Name VMConfigs -ItemType Directory -Force | Out-Null
-            Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
-            Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
+            # Copy-Item -Path $guiVHDXPath -Destination ($MountedDrive + ":\VMs\Base\GUI.vhdx") -Force
+            # Copy-Item -Path $azSHCIVHDXPath -Destination ($MountedDrive + ":\VMs\Base\AzSHCI.vhdx") -Force
             Copy-Item -Path .\Applications\SCRIPTS -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
             Copy-Item -Path .\Applications\SDNEXAMPLES -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force
             Copy-Item -Path '.\Applications\Windows Admin Center' -Destination ($MountedDrive + ":\VmConfigs") -Recurse -Force  
 
-        }       
+        # }       
     
         # Dismount VHDX
 
@@ -2586,16 +2586,17 @@ function New-HyperConvergedEnvironment {
 
     )
 
-    Invoke-Command -ComputerName Admincenter -Credential $domainCred -ScriptBlock {
+    Invoke-Command -ComputerName AzSHOST1 -Credential $domainCred -ScriptBlock {
 
         $SDNConfig = $Using:SDNConfig
-        $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
+        # $AzSHOSTs = @("AzSHOST1", "AzSHOST2")
+        $AzSHOSTs = @("AzSHOST1")
 
         $ErrorActionPreference = "Stop"
         $VerbosePreference = "Continue"
 
         $domainCred = new-object -typename System.Management.Automation.PSCredential `
-            -argumentlist (($SDNConfig.SDNDomainFQDN.Split(".")[0]) + "\administrator"), `
+            -argumentlist (".\administrator"), `
         (ConvertTo-SecureString $SDNConfig.SDNAdminPassword -AsPlainText -Force)
 
         foreach ($AzSHOST in $AzSHOSTs) {
@@ -3289,6 +3290,8 @@ $starttime = Get-Date
 $SDNConfig = Import-PowerShellDataFile -Path $ConfigurationDataFile
 Copy-Item $ConfigurationDataFile -Destination .\Applications\SCRIPTS -Force
 
+Write-Verbose "SDNConfig is $SDNConfig"
+
 # Set VM Host Memory
 $totalPhysicalMemory = (Get-CimInstance -ClassName 'Cim_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
@@ -3686,63 +3689,63 @@ Test-AzSHOSTVMConnection @params
     
 # Create NAT Virtual Switch on AzSMGMT
 
-if ($natConfigure) {
+# if ($natConfigure) {
 
-    if (!$SDNConfig.MultipleHyperVHosts) { $SwitchName = $SDNConfig.InternalSwitch }
-    else { $SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName }
+#     if (!$SDNConfig.MultipleHyperVHosts) { $SwitchName = $SDNConfig.InternalSwitch }
+#     else { $SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName }
     
-    Write-Verbose "Creating NAT Switch on switch $SwitchName"
-    $VerbosePreference = "SilentlyContinue"
+#     Write-Verbose "Creating NAT Switch on switch $SwitchName"
+#     $VerbosePreference = "SilentlyContinue"
 
-    $params = @{
+#     $params = @{
 
-        SwitchName  = $SwitchName
-        VMPlacement = $VMPlacement
-        SDNConfig   = $SDNConfig
-    }
+#         SwitchName  = $SwitchName
+#         VMPlacement = $VMPlacement
+#         SDNConfig   = $SDNConfig
+#     }
 
-    New-NATSwitch  @params
-    $VerbosePreference = "Continue"
+#     New-NATSwitch  @params
+#     $VerbosePreference = "Continue"
 
-}
+# }
     
 # Provision AzSMGMT VMs (DC, Router, and AdminCenter)
 
-Write-Verbose  "Configuring Management VM"
+# Write-Verbose  "Configuring Management VM"
 
 
-$params = @{
+# $params = @{
 
-    SDNConfig  = $SDNConfig
-    localCred  = $localCred
-    domainCred = $domainCred
+#     SDNConfig  = $SDNConfig
+#     localCred  = $localCred
+#     domainCred = $domainCred
 
-}
+# }
 
-# Set-AzSMGMT @params
+# # Set-AzSMGMT @params
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 
 $params = @{
 
     localCred  = $localCred
-    domainCred = $domainCred
+    domainCred = $localCred
 
 }
 
-# New-HyperConvergedEnvironment @params
+New-HyperConvergedEnvironment @params
 
 
 # Create S2D Cluster
 
-$params = @{
+# $params = @{
 
-    SDNConfig          = $SDNConfig
-    DomainCred         = $domainCred
-    AzStackClusterNode = 'AzSHOST1'
-    # AzStackClusterNode = 'AzSHOST2'
+#     SDNConfig          = $SDNConfig
+#     DomainCred         = $domainCred
+#     AzStackClusterNode = 'AzSHOST1'
+#     # AzStackClusterNode = 'AzSHOST2'
 
-}
+# }
 
 
 # New-SDNS2DCluster @params
