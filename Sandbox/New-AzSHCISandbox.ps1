@@ -3557,8 +3557,9 @@ if (!$SDNConfig.MultipleHyperVHosts) {
 
 $vmMacs = @()
 
-foreach ($VM in $VMPlacement) {
+# foreach ($VM in $VMPlacement) {
 
+    $VM = $VMPlacement[0]
     Write-Verbose "Generating the VM: $VM" 
 
     $params = @{
@@ -3582,7 +3583,7 @@ foreach ($VM in $VMPlacement) {
 
     }
         
-}
+# }
     
 # Inject Answer Files and Binaries into Virtual Machines
 
@@ -3715,7 +3716,7 @@ $params = @{
 
 }
 
-Set-AzSMGMT @params
+# Set-AzSMGMT @params
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 
@@ -3726,7 +3727,7 @@ $params = @{
 
 }
 
-New-HyperConvergedEnvironment @params
+# New-HyperConvergedEnvironment @params
 
 
 # Create S2D Cluster
@@ -3740,54 +3741,54 @@ $params = @{
 }
 
 
-New-SDNS2DCluster @params
+# New-SDNS2DCluster @params
 
 
 
 # Install and Configure Network Controller if specified
 
-If ($SDNConfig.ProvisionNC) {
+# If ($SDNConfig.ProvisionNC) {
 
-    $params = @{
+#     $params = @{
 
-        SDNConfig  = $SDNConfig
-        domainCred = $domainCred
+#         SDNConfig  = $SDNConfig
+#         domainCred = $domainCred
 
-    }
+#     }
 
-    New-SDNEnvironment @params
+#     New-SDNEnvironment @params
 
-    # Add Systems to Windows Admin Center
+#     # Add Systems to Windows Admin Center
 
-    $fqdn = $SDNConfig.SDNDomainFQDN
+#     $fqdn = $SDNConfig.SDNDomainFQDN
 
-    $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
+#     $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
 
-    # Add VMs for Domain Admin
+#     # Add VMs for Domain Admin
 
-    $params = @{
+#     $params = @{
 
-        SDNLabSystems = $SDNLabSystems 
-        SDNConfig     = $SDNConfig
-        domainCred    = $domainCred
+#         SDNLabSystems = $SDNLabSystems 
+#         SDNConfig     = $SDNConfig
+#         domainCred    = $domainCred
 
-    }
+#     }
 
-    #   Add-WACtenants @params
+#     #   Add-WACtenants @params
 
 
-    # Add VMs for NC Admin
+#     # Add VMs for NC Admin
 
-    $params.domainCred = $NCAdminCred
+#     $params.domainCred = $NCAdminCred
 
-    #   Add-WACtenants @params
+#     #   Add-WACtenants @params
 
-    # Enable Single Sign On
+#     # Enable Single Sign On
 
-    Write-Verbose "Enabling Single Sign On in WAC"
-    enable-singleSignOn -SDNConfig $SDNConfig 
+#     Write-Verbose "Enabling Single Sign On in WAC"
+#     enable-singleSignOn -SDNConfig $SDNConfig 
     
-}
+# }
 
 
 # Finally - Add RDP Link to Desktop
