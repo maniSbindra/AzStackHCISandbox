@@ -30,13 +30,13 @@ You come up with the following action plan:
 
 3. In **Windows Admin Center**, add a **Hyper-Converged Cluster Connection** to SDNCluster and your network controller if you haven't already done so.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-01.png "Add Hyper-Converged Cluster Connection")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-01.png "Add Hyper-Converged Cluster Connection")
 
 1. Navigate to **Windows Admin Center -> sdncluster -> Virtual Networks**. In **Virtual Networks**, select **Inventory**.
 
 2. In **Inventory** select **+ New**
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-02.png "Inventory Screen for Virtual Networks")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-02.png "Inventory Screen for Virtual Networks")
 
 1. In the Virtual Network dialog, fill in the following and then click **Submit**:
 
@@ -47,11 +47,11 @@ You come up with the following action plan:
 | Subnet Name: | add **TenantSubnet1**   |
 | Subnet Address Prefix: | add **192.172.33.0/24**  |
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-07.png "Final screen of creating a virtual network")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-07.png "Final screen of creating a virtual network")
 
 1. Wait about a minute and then you should see the following in your Virtual Networks inventory:
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-03.png "Inventory Screen for Virtual Networks")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-03.png "Inventory Screen for Virtual Networks")
 
 1. Step 01 is now complete.
 
@@ -65,7 +65,7 @@ You come up with the following action plan:
 
 3. Run ``.\01_Create_TenantVMs.ps1``
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-06.png  "Screenshot of PowerShell script to create the Tenant VM VHDs")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-06.png  "Screenshot of PowerShell script to create the Tenant VM VHDs")
 
 1. Wait for the script to successfully complete
 
@@ -83,7 +83,7 @@ You come up with the following action plan:
 
 3. In **Inventory** select **+ New**
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-04.png "Inventory Screen for Virtual Machines")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-04.png "Inventory Screen for Virtual Machines")
 
 1. Fill in the **New Virtual Machine Dialog with the following and then click **Create**:
 
@@ -127,7 +127,7 @@ You come up with the following action plan:
 
 6. After both VMs have been created, start both of them and then continute onto the next step.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-08.png "Inventory Screen for Virtual Machines")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-08.png "Inventory Screen for Virtual Machines")
 
 
 
@@ -137,7 +137,7 @@ You come up with the following action plan:
 
 2. From a **CMD** Prompt or a Windows PowerShell prompt, Try pinging **192.172.33.5**.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-08.png) "Inventory Screen for Virtual Machines")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-08.png) "Inventory Screen for Virtual Machines")
 
 1. If you are successful, then you have successfully created a TenantVM Network and have two Hyper-V virtual machines communicating over that network.
 
@@ -147,7 +147,7 @@ In this exercise, we will look at the host SDNHOST2 and examine its provider add
 
 1. Using Windows Admin Center, go to SDNHOST2 and then select PowerShell and login.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-09.png "Logging into SDNHOST2 PowerShell")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-09.png "Logging into SDNHOST2 PowerShell")
 
 1. Type in the PowerShell command **Get-ProviderAddress** and then press **Enter** 
 
@@ -155,7 +155,7 @@ In this exercise, we will look at the host SDNHOST2 and examine its provider add
 
 3. Next, run **Get-PACAMapping** to get a list the mapping of PA Addresses to hosts.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-10.png "PA Addressing in a nutshell")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-10.png "PA Addressing in a nutshell")
 
 1. In the screenshot above, we can see that TenantVM1 **192.172.33.5 (TenantVM1)** is on this host as its PA is 172.17.0.7. When **Get-ProviderAddress** was run, we could see that 172.17.0.7 belongs to SDNHOST2. However, for **192.172.33.4 (TenantVM2)**, the PA is (172.17.0.9) which is **NOT** local. So if TenantVM1 tries to send traffic to TenantVM2, SDNHOST2's VM Switch is going send the traffic over the PA address 172.17.0.9 (Which, this example is SDNHOST3)
 
@@ -165,11 +165,11 @@ A common problem in the PA logical network is that the physical network ports an
 
 1. Using Windows Admin Center, go to SDNHOST2 and then select PowerShell and login.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-09.png "Logging into SDNHOST2 PowerShell")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-09.png "Logging into SDNHOST2 PowerShell")
 
 1. Run **Test-EncapOverheadSettings** and examine the results.
 
-![alt text](https://github.com/microsoft/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-11.png "Logging into SDNHOST2 PowerShell")
+![alt text](https://github.com/manisbindra/AzStackHCISandbox/blob/3aceaf8de0f881845cec1a8dd66a1825357bbfa0/Scenarios/Media/Screenshots/03-res/1-11.png "Logging into SDNHOST2 PowerShell")
 
 
 
