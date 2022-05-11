@@ -483,7 +483,11 @@ function New-NestedVM {
         # Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
         # Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
         Add-VMNetworkAdapter -VMName $AzSHOST -Name "intnetadp" -SwitchName $VMSwitch
-        $vmMac = ((Get-VMNetworkAdapter -Name "intnetadp" -VMName $AzSHOST).MacAddress) -replace '..(?!$)', '$&-'
+
+
+        Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN -SwitchName $VMSwitch
+        Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -SwitchName $VMSwitch
+        $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $AzSHOST).MacAddress) -replace '..(?!$)', '$&-'
         Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
         if ($AzSHOST -ne "AzSMGMT") {
@@ -3676,11 +3680,11 @@ $params = @{
 
 }
 
-Start-PowerShellScriptsOnHosts @params
+# Start-PowerShellScriptsOnHosts @params
 
 $params.scriptpath = 'Get-Netadapter ((Get-NetAdapterAdvancedProperty | Where-Object {$_.DisplayValue -eq "SDN2"}).Name) | Rename-NetAdapter -NewName FABRIC2'
 
-Start-PowerShellScriptsOnHosts @params
+# Start-PowerShellScriptsOnHosts @params
     
 # Restart Machines
 
