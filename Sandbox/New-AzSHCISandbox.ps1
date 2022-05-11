@@ -148,18 +148,21 @@ function New-InternalSwitch {
         $SDNConfig
     )
     
-    $querySwitch = Get-VMSwitch -Name $pswitchname -ErrorAction Ignore
+    $pswitchname2 = "InternalSwitch"
+    
+
+    $querySwitch = Get-VMSwitch -Name $pswitchname2 -ErrorAction Ignore
     
     if (!$querySwitch) {
     
-        New-VMSwitch -SwitchType Internal -MinimumBandwidthMode None -Name $pswitchname | Out-Null
+        New-VMSwitch -SwitchType Internal None -Name $pswitchname2 | Out-Null
     
         #Assign IP to Internal Switch
-        $InternalAdapter = Get-Netadapter -Name "vEthernet ($pswitchname)"
+        $InternalAdapter = Get-Netadapter -Name "vEthernet ($pswitchname2)"
         $IP = $SDNConfig.PhysicalHostInternalIP
-        $Prefix = ($SDNConfig.AzSMGMTIP.Split("/"))[1]
-        $Gateway = $SDNConfig.SDNLABRoute
-        $DNS = $SDNConfig.SDNLABDNS
+        $Prefix = "24"
+        $Gateway = $SDNConfig.PhysicalHostInternalIP
+        $DNS = $SDNConfig.PhysicalHostInternalIP
         
         $params = @{
 
@@ -175,7 +178,7 @@ function New-InternalSwitch {
     
     }
     
-    Else { Write-Verbose "Internal Switch $pswitchname already exists. Not creating a new internal switch." }
+    Else { Write-Verbose "Internal Switch $pswitchname2 already exists. Not creating a new internal switch." }
     
 }
     
@@ -189,23 +192,22 @@ function New-HostvNIC {
 
     $ErrorActionPreference = "Stop"
 
-    $SBXIP = 250
+    # $SBXIP = 250
 
-    foreach ($SDNSwitchHost in $SDNConfig.MultipleHyperVHostNames) {
+    # foreach ($SDNSwitchHost in $SDNConfig.MultipleHyperVHostNames) {
 
-        Write-Verbose "Creating vNIC on $SDNSwitchHost"
+        Write-Verbose "Creating vNIC on AzSHOST1"
 
-        Invoke-Command -ComputerName $SDNSwitchHost -ArgumentList $SDNConfig, $SBXIP -ScriptBlock {
+        Invoke-Command -ComputerName "AzSHOST1" -ArgumentList $SDNConfig -ScriptBlock {
 
             $SDNConfig = $args[0]
-            $SBXIP = $args[1]
 
-            $vnicName = $SDNConfig.MultipleHyperVHostExternalSwitchName + "-SBXAccess"
-    
+            $vnicName = "vnicexternalaccess"
+            $pswitchname2 = "InternalSwitch"
 
             $params = @{
 
-                SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName
+                SwitchName = $pswitchname2
                 Name       = $vnicName
 
             }
@@ -215,10 +217,10 @@ function New-HostvNIC {
 
             Set-VMNetworkAdapterVlan -ManagementOS -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
   
-            $IP = ($SDNConfig.MGMTSubnet.TrimEnd("0/24")) + $SBXIP
-            $prefix = $SDNConfig.MGMTSubnet.Split("/")[1]
-            $gateway = $SDNConfig.BGPRouterIP_MGMT.TrimEnd("/24")
-            $DNS = $SDNConfig.SDNLABDNS
+            $IP = "192.168.1.250"
+            $prefix = "24"
+            $gateway = "192.168.1.1"
+            $DNS = "192.168.1.1"
 
             $NetAdapter = Get-NetAdapter | Where-Object { $_.Name -match $vnicName }[0]
 
@@ -238,7 +240,7 @@ function New-HostvNIC {
 
         $SBXIP--
     
-    }
+    # }
     
 }
     
@@ -476,10 +478,12 @@ function New-NestedVM {
         }
     
         Set-VM -Name $AzSHOST -ProcessorCount 4 -AutomaticStartAction Start
-        Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
-        Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
-        Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
-        $vmMac = ((Get-VMNetworkAdapter -Name SDN -VMName $AzSHOST).MacAddress) -replace '..(?!$)', '$&-'
+        # Add-VMNetworkAdapter -VMName AzSHOST1 -Name intnic -SwitchName $switchName
+        # Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
+        # Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
+        # Add-VMNetworkAdapter -VMName $AzSHOST -Name SDN2 -DeviceNaming On -SwitchName $VMSwitch
+        Add-VMNetworkAdapter -VMName $AzSHOST -Name "intnetadp" -SwitchName $VMSwitch
+        $vmMac = ((Get-VMNetworkAdapter -Name "intnetadp" -VMName $AzSHOST).MacAddress) -replace '..(?!$)', '$&-'
         Write-Verbose "Virtual Machine FABRIC NIC MAC is = $vmMac"
 
         if ($AzSHOST -ne "AzSMGMT") {
@@ -496,8 +500,8 @@ function New-NestedVM {
 
         
 
-        Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
-        Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
+        # Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200
+        # Set-VMNetworkAdapterVlan -VMName $AzSHOST -VMNetworkAdapterName SDN2 -Trunk -NativeVlanId 0 -AllowedVlanIdList 1-200  
 
         if ($AzSHOST -ne "AzSMGMT") {
 
@@ -3411,11 +3415,26 @@ if (!$SDNConfig.MultipleHyperVHosts) {
     
     }
 
-    New-InternalSwitch @params
+    # New-InternalSwitch @params
+    ## Adding Inline
+
+    $switchName = "newintswitch"
+    New-VMSwitch -Name $switchName -SwitchType Internal
+    New-NetNat –Name $switchName –InternalIPInterfaceAddressPrefix “192.168.0.0/24”
+    $ifIndex = (Get-NetAdapter | ? {$_.name -like "*$switchName)"}).ifIndex
+    New-NetIPAddress -IPAddress 192.168.0.1 -InterfaceIndex $ifIndex -PrefixLength 24
+
+    Add-DhcpServerV4Scope -Name "DHCP-$switchName" -StartRange 192.168.0.50 -EndRange 192.168.0.100 -SubnetMask 255.255.255.0
+    Set-DhcpServerV4OptionValue -Router 192.168.0.1 -DnsServer 168.63.129.16
+    Restart-service dhcpserver
+
+    
+
+
 
     Write-Verbose "Creating NAT Switch"
 
-    set-hostnat -SDNConfig $SDNConfig
+    # set-hostnat -SDNConfig $SDNConfig
 
     $VMSwitch = $InternalSwitch
 
@@ -3518,7 +3537,7 @@ if ($SDNConfig.MultipleHyperVHosts) {
     $VMSwitch = $SDNConfig.MultipleHyperVHostExternalSwitchName
 
     # Write-Verbose "Creating vNIC on $env:COMPUTERNAME"
-    New-HostvNIC -SDNConfig $SDNConfig -localCred $localCred
+    # New-HostvNIC -SDNConfig $SDNConfig -localCred $localCred
 
 }
     
@@ -3573,7 +3592,7 @@ $vmMacs = @()
         VMHost     = $VM.VMHost
         AzSHOST    = $VM.AzSHOST
         HostVMPath = $HostVMPath
-        VMSwitch   = $VMSwitch
+        VMSwitch   = $switchName
         SDNConfig  = $SDNConfig
 
     }
@@ -3726,14 +3745,18 @@ Test-AzSHOSTVMConnection @params
 
 # Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
 
-$params = @{
+# $params = @{
 
-    localCred  = $localCred
-    domainCred = $localCred
+#     localCred  = $localCred
+#     domainCred = $localCred
 
-}
+# }
 
-New-HyperConvergedEnvironment @params
+# New-HyperConvergedEnvironment @params
+
+# inline
+
+
 
 
 # Create S2D Cluster
