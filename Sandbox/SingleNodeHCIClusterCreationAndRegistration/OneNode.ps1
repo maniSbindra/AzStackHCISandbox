@@ -140,6 +140,8 @@ function Deploy-AksHciOneNode {
     
     $Vnet = New-AksHciNetworkSetting -name myvnet -vSwitchName "HCI-Uplink" -k8sNodeIpPoolStart $AksNodeIpPoolStart -k8sNodeIpPoolEnd $AksNodeIpPoolEnd `
         -vipPoolStart $AksVipPoolStart -vipPoolEnd $AksVipPoolEnd -ipAddressPrefix $CidrSubnet -gateway $DefaultGw -dnsServers $dnsServer
+    
+    Out-File "C:\Windows\System32\drivers\etc\hosts" -Encoding utf8 -Append -InputObject "$CloudAgentIp $CloudAgentName"
 
     Set-AksHciConfig -imageDir C:\ClusterStorage\Volume01\Images -workingDir C:\ClusterStorage\Volume01\ImageStore -clusterRoleName $CloudAgentName `
         -cloudConfigLocation C:\ClusterStorage\Volume01\Config -vnet $Vnet -cloudservicecidr $AksCloudIpCidr
