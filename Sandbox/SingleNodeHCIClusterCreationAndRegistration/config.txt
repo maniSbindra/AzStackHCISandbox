@@ -1,0 +1,20 @@
+HciNodeName = ryzen1node
+ClusterIP = 192.168.0.4
+CidrSubnet = 192.168.0.0/24
+AzSubscription = subscription_id
+
+# NOTE: Not all regions support Azure Stack HCI and AKS-HCI. Check for valid regions before modifying.
+AzRegion = EastUS
+
+AksNodeIpPoolStart =   192.168.0.6
+AksNodeIpPoolEnd   =   192.168.0.11
+AksVipPoolStart    =   192.168.0.12
+AksVipPoolEnd      =   192.168.0.20
+AksCloudIpCidr     =   192.168.0.25/24
+
+wlClusterName = aks-workload-cluster
+wlsLinuxWorkerNodes = 1
+wlWindowsWorkerNodes = 0
+wlControlPlaneVmSize = Standard_K8S3_v1
+wlLoadBalancerVmSize = Standard_K8S2_v1
+wlWorkerNodeVmSize = Standard_D4s_v3
