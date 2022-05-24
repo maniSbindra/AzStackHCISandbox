@@ -49,6 +49,11 @@ Configuration ASHCIHost {
     Name='Hyper-V-Tools'
     IncludeAllSubFeature = $true
     }
+
+    WindowsFeature DHCPServer{
+        Ensure = 'Present'
+        Name='DHCP'
+    }
     
     #Required Folders for ASHCI Deployment
     
