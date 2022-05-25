@@ -44,7 +44,8 @@ function Install-RequiredModules {
     Write-Verbose "Fetch the modified Az.StackHCI module needed for workgroup cluster registration"
     Remove-Item 'C:\Program Files\WindowsPowerShell\Modules\Az.StackHCI' -Recurse -Force -ErrorAction SilentlyContinue
     Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force
-    $hcicustommoduleuri="https://github.com/mgodfre3/Single-Node-POC/blob/main/Single-NodeHC-NoDomain/CustomModules.zip?raw=true"
+    # $hcicustommoduleuri="https://github.com/mgodfre3/Single-Node-POC/blob/main/Single-NodeHC-NoDomain/CustomModules.zip?raw=true"
+    $hcicustommoduleuri="https://github.com/mgodfre3/Single-Node-POC/blob/8e034f345a47a6608294a63b0e50e1650ac6cf62/Single-NodeHC-NoDomain/CustomModules.zip?raw=true"
     New-Item -Path C:\ -Name Temp -ItemType Directory
     Invoke-WebRequest -Uri $hcicustommoduleuri -OutFile 'C:\Temp\Az.StackHCI-Custom.zip'
     Expand-Archive 'C:\Temp\AZ.StackHCI-Custom.zip' -DestinationPath 'C:\Temp' -Force
@@ -131,6 +132,7 @@ function Deploy-AksHciOneNode {
     Import-Module Moc
 
     $DnsServer = (Get-DnsClientServerAddress -InterfaceAlias "vEthernet (HCI-Uplink)" -AddressFamily IPv4).ServerAddresses[0]
+    # Write-Verbose "DNS Server : $DnsServer"
     $DefaultGw = (Get-NetRoute "0.0.0.0/0").NextHop
     $DefaultGw = $DefaultGw[0]
 
