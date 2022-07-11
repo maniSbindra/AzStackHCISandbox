@@ -3428,7 +3428,7 @@ if (!$SDNConfig.MultipleHyperVHosts) {
     $ifIndex = (Get-NetAdapter | ? {$_.name -like "*$switchName)"}).ifIndex
     New-NetIPAddress -IPAddress 192.168.0.1 -InterfaceIndex $ifIndex -PrefixLength 24
 
-    Set-DnsClientServerAddress -InterfaceAlias 'vEthernet (newintswitch)' -ServerAddresses ("168.63.129.16")
+    Set-DnsClientServerAddress -InterfaceIndex $ifIndex -ServerAddresses ("168.63.129.16")
 
     Add-DhcpServerV4Scope -Name "DHCP-$switchName" -StartRange 192.168.0.50 -EndRange 192.168.0.100 -SubnetMask 255.255.255.0
     Set-DhcpServerV4OptionValue -Router 192.168.0.1 -DnsServer 168.63.129.16
