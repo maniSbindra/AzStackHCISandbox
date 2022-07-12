@@ -92,7 +92,8 @@ function Install-HybridPrereqs {
 function Deploy-OneNodeCluster {
 
     # Fetch the NICs that are up
-    $adapter = (Get-NetAdapter -Physical | Where-Object {$_.Status -eq "Up"})
+    # $adapter = (Get-NetAdapter -Physical | Where-Object {$_.Status -eq "Up"})
+    $adapter = (Get-NetAdapter -Physical | Where-Object {$_.Status -eq "Up"} | Where-Object {$_.Name -eq "Ethernet 4"})
 
     # Create a VM Switch on the first NIC only (simplicty)
     Write-Verbose "Creating External VMSwitch"
