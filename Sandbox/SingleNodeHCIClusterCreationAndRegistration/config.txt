@@ -1,20 +1,47 @@
-HciNodeName = ryzen1node
-ClusterIP = 192.168.0.4
-CidrSubnet = 192.168.0.0/24
-AzSubscription = subscription-id
+#-- Jumpstart Scenarios --#
+deployArcDataServices   =   false
+deploySQLMI             =   false
+deployPostgreSQL        =   false
+deployAppService        =   false
+deployFunction          =   false
+deployApiMgmt           =   false
+deployLogicApp          =   false
 
-# NOTE: Not all regions support Azure Stack HCI and AKS-HCI. Check for valid regions before modifying.
-AzRegion = EastUS
+#-- Host variables --#
+adminUsername           =   Administrator
+adminPassword           =   P@ssw0rd1
+nodeName                =   OneM5Node
 
-AksNodeIpPoolStart =   192.168.0.6
-AksNodeIpPoolEnd   =   192.168.0.11
-AksVipPoolStart    =   192.168.0.12
-AksVipPoolEnd      =   192.168.0.20
-AksCloudIpCidr     =   192.168.0.76/24
+#-- Azure variables --#
+spnDisplayName          =   OneNodeM5Spn
+resourceGroup           =   OneNodeM5Rg
+subscriptionId          =   your_subscripton_id
+tenantId                =   your_tenant_id
+azureLocation           =   eastus
+workspaceName           =   OneNodeM5Logs
 
-wlClusterName = aks-workload-cluster
-wlsLinuxWorkerNodes = 1
-wlWindowsWorkerNodes = 0
-wlControlPlaneVmSize = Standard_K8S3_v1
-wlLoadBalancerVmSize = Standard_K8S2_v1
-wlWorkerNodeVmSize = Standard_D4s_v3
+#-- HCI variables --#
+hciClusterName          =   OneNodeM5Clu
+hciNodeIp               =   192.168.0.51
+hciClusterIp            =   192.168.0.4
+hciArcServersRg         =   OneNodeM5ArcRg
+
+#-- AKS variables --#
+aksNodeIpPoolStart      =   192.168.0.6
+aksNodeIpPoolEnd        =   192.168.0.11
+aksVipPoolStart         =   192.168.0.12
+aksVipPoolEnd           =   192.168.0.20
+aksCloudAgentIp         =   192.168.0.76
+
+aksCloudAgentName       =   akshcimgmt
+aksWorkloadCluster      =   aks-workload-cluster
+aksWorkerNodeVmSize     =   Standard_A4_v2
+
+#-- Arc Data Services variables --#
+arcDsExtName            =   arcdataservices
+arcDsNamespace          =   arcds
+AZDATA_USERNAME         =   admin
+AZDATA_PASSWORD         =   Microsoft#1
+ACCEPT_EULA             =   true
+
+#-- Auto Generated variables --#

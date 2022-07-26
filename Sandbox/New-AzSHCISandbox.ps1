@@ -477,7 +477,7 @@ function New-NestedVM {
 
         }
     
-        Set-VM -Name $AzSHOST -ProcessorCount 4 -AutomaticStartAction Start
+        Set-VM -Name $AzSHOST -ProcessorCount 6 -AutomaticStartAction Start
         # Add-VMNetworkAdapter -VMName AzSHOST1 -Name intnic -SwitchName $switchName
         # Get-VMNetworkAdapter -VMName $AzSHOST | Rename-VMNetworkAdapter -NewName "SDN"
         # Get-VMNetworkAdapter -VMName $AzSHOST | Set-VMNetworkAdapter -DeviceNaming On -StaticMacAddress  ("{0:D12}" -f ( Get-Random -Minimum 0 -Maximum 99999 ))
@@ -971,6 +971,17 @@ function Set-SDNserver {
                 $storageAIP = $sdnconfig.storageAsubnet.Replace("0/24", $int)
                 $storageBIP = $sdnconfig.storageBsubnet.Replace("0/24", $int)
 
+                # Set Dns suffix
+                # $dnsSuffix = $sdnconfig.SDNDomainFQDN
+                # Write-Verbose "Setting DNS suffix in $env:COMPUTERNAME"
+                # Set-ItemProperty “HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\” –Name Domain –Value $dnsSuffix | Out-Null
+                # Write-Verbose "DNS suffix set in $env:COMPUTERNAME" 
+                # Write-Verbose "Setting DNS suffix in $env:COMPUTERNAME"
+                # $VerbosePreference = "SilentlyContinue"
+                # Set-ItemProperty “HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\” –Name Domain –Value $dnsSuffix
+                # $VerbosePreference = "Continue"
+                # Write-Verbose "DNS suffix set in $env:COMPUTERNAME"
+                
 
                 # Set Name and IP Addresses on Storage Interfaces
                 $storageNICs = Get-NetAdapterAdvancedProperty | Where-Object { $_.DisplayValue -match "Storage" }
@@ -1008,6 +1019,10 @@ function Set-SDNserver {
                     Write-Verbose "Installing and Configuring Failover Clustering on $env:COMPUTERNAME"
                     $VerbosePreference = "SilentlyContinue"
                     Install-WindowsFeature -Name Failover-Clustering -IncludeAllSubFeature -IncludeManagementTools -ComputerName $env:COMPUTERNAME -Credential $localCred | Out-Null 
+
+
+                    
+
 
                 }
 
@@ -3282,6 +3297,34 @@ function enable-singleSignOn {
 
 }
 
+function Set-DNS-Suffix {
+
+    param (
+
+        $computerName,
+        $dnsSuffix, 
+        $localCred
+
+    )
+    # $AzSHOST1 = $SDNConfig.AzSHOST1IP.Split("/")[0]
+
+   
+
+        
+
+    Invoke-Command -ComputerName $computerName -ArgumentList $dnsSuffix -Credential $localCred -ScriptBlock  {
+
+        $dnsSuffix = $args[0]
+        # $dnsSuffix = $SDNConfig.SDNDomainFQDN
+        Write-Verbose "Setting DNS suffix"
+        Set-ItemProperty “HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\” –Name Domain –Value $dnsSuffix | Out-Null
+        Write-Verbose "DNS suffix set" 
+
+
+    } 
+
+}
+
 #endregion
    
 #region Main
@@ -3711,125 +3754,38 @@ Test-AzSHOSTVMConnection @params
 
 Write-Verbose "Ensuring that all VMs have been restarted after Hyper-V install.."
 Test-AzSHOSTVMConnection @params
-    
-# Create NAT Virtual Switch on AzSMGMT
-
-# if ($natConfigure) {
-
-#     if (!$SDNConfig.MultipleHyperVHosts) { $SwitchName = $SDNConfig.InternalSwitch }
-#     else { $SwitchName = $SDNConfig.MultipleHyperVHostExternalSwitchName }
-    
-#     Write-Verbose "Creating NAT Switch on switch $SwitchName"
-#     $VerbosePreference = "SilentlyContinue"
-
-#     $params = @{
-
-#         SwitchName  = $SwitchName
-#         VMPlacement = $VMPlacement
-#         SDNConfig   = $SDNConfig
-#     }
-
-#     New-NATSwitch  @params
-#     $VerbosePreference = "Continue"
-
-# }
-    
-# Provision AzSMGMT VMs (DC, Router, and AdminCenter)
-
-# Write-Verbose  "Configuring Management VM"
 
 
-# $params = @{
+# Set DNS suffix for single node cluster
+Write-Verbose "Setting DNS Suffix on Hosts"
+$params = @{
 
-#     SDNConfig  = $SDNConfig
-#     localCred  = $localCred
-#     domainCred = $domainCred
+    computerName = "AzSHOST1"
+    dnsSuffix = $SDNConfig.SDNDomainFQDN
+    localcred   = $localCred
 
-# }
-
-# # Set-AzSMGMT @params
-
-# Provision Hyper-V Logical Switches and Create S2D Cluster on Hosts
-
-# $params = @{
-
-#     localCred  = $localCred
-#     domainCred = $localCred
-
-# }
-
-# New-HyperConvergedEnvironment @params
-
-# inline
-
-
-
-
-# Create S2D Cluster
-
-# $params = @{
-
-#     SDNConfig          = $SDNConfig
-#     DomainCred         = $domainCred
-#     AzStackClusterNode = 'AzSHOST1'
-#     # AzStackClusterNode = 'AzSHOST2'
-
-# }
-
-
-# New-SDNS2DCluster @params
-
-
-
-# Install and Configure Network Controller if specified
-<#
-
-If ($SDNConfig.ProvisionNC) {
-
-    $params = @{
-
-        SDNConfig  = $SDNConfig
-        domainCred = $domainCred
-
-    }
-
-    New-SDNEnvironment @params
-
-    # Add Systems to Windows Admin Center
-
-    $fqdn = $SDNConfig.SDNDomainFQDN
-
-    $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
-
-    # Add VMs for Domain Admin
-
-    $params = @{
-
-        SDNLabSystems = $SDNLabSystems 
-        SDNConfig     = $SDNConfig
-        domainCred    = $domainCred
-
-    }
-
-    #   Add-WACtenants @params
-
-
-    # Add VMs for NC Admin
-
-    $params.domainCred = $NCAdminCred
-
-    #   Add-WACtenants @params
-
-    # Enable Single Sign On
-
-    Write-Verbose "Enabling Single Sign On in WAC"
-    enable-singleSignOn -SDNConfig $SDNConfig 
-    
 }
 
+Set-DNS-Suffix @params
 
- # 
-#>
+$params.scriptpath = "Restart-Computer -Force"
+Start-PowerShellScriptsOnHosts @params
+Start-Sleep -Seconds 30
+
+$params = @{
+
+    VMPlacement = $VMPlacement
+    localcred   = $localCred
+
+}
+
+Test-AzSHOSTVMConnection @params
+
+   
+# Wait for AzSHOSTs to come online
+
+Write-Verbose "Waiting for VMs to restart..."
+    
 
 # Finally - Add RDP Link to Desktop
 
