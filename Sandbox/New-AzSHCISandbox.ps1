@@ -3017,7 +3017,7 @@ function Add-WACtenants {
         
             # Set Variables
 
-            $SDNConfig = Import-PowerShellDataFile -Path C:\SCRIPTS\AzSHCISandbox-Config.psd1
+            $SDNConfig = Import-PowerShellDataFile -Path C:\AzHCI_Sandbox\AzSHCISandbox-main\AzSHCISandbox-Config.psd1
             $fqdn = $SDNConfig.SDNDomainFQDN
             $SDNLabSystems = @("bgp-tor-router", "$($SDNConfig.DCName).$fqdn", "NC01.$fqdn", "MUX01.$fqdn", "GW01.$fqdn", "GW02.$fqdn")
             $VerbosePreference = "Continue"
@@ -3346,7 +3346,7 @@ Write-Verbose "SDNConfig is $SDNConfig"
 # Set VM Host Memory
 $totalPhysicalMemory = (Get-CimInstance -ClassName 'Cim_PhysicalMemory' | Measure-Object -Property Capacity -Sum).Sum / 1GB
 $availablePhysicalMemory = (([math]::Round(((((Get-Counter -Counter '\Hyper-V Dynamic Memory Balancer(System Balancer)\Available Memory For Balancing' -ComputerName $env:COMPUTERNAME).CounterSamples.CookedValue) / 1024) - 18) / 2))) * 1073741824
-$SDNConfig.NestedVMMemoryinGB = $availablePhysicalMemory
+# $SDNConfig.NestedVMMemoryinGB = $availablePhysicalMemory
 
 # Set-Credentials
 $localCred = new-object -typename System.Management.Automation.PSCredential `
@@ -3768,9 +3768,15 @@ $params = @{
 
 Set-DNS-Suffix @params
 
-$params.scriptpath = "Restart-Computer -Force"
-Start-PowerShellScriptsOnHosts @params
+# $params.scriptpath = "Restart-Computer -Force"
+# Start-PowerShellScriptsOnHosts @params
+
+
+
 Start-Sleep -Seconds 30
+
+
+Restart-VM -Name AzsHost1 -Force 
 
 $params = @{
 
