@@ -43,9 +43,9 @@ It is also useful to have a look at the progress.log file, which shows the seque
 
 After required modifications have been made to config.txt file, execute the OneNode.ps1 script as follows
 
-    ```
+```
     & .\OneNode.ps1
-    ```
+```
 
 In the step where the service principal gets created, you will need to login in to your Azure Subscript once, after which the service principal is appended to the config.txt and used from there in the subsequent steps. Manual intervention is also need to confirm the nested VM restart, however you **do not** need to execute the script manually again
 
