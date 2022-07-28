@@ -1,9 +1,9 @@
 
 # Purpose of this fork was to tweak the original repository scripts to create a single node HCI cluster for testing purposes only
 
-## What do the script/scripts do?
+## What do the scripts do?
 
-The templates / scripts are executed in a series of 3 steps. At the end of step 3 we get a Virtual Single node HCI cluster which is registed to Azure. Additionaly we get control plane and workload AKS clusters created on the HCI cluster, and registered as Kubernetes Azure Arc Clusters.
+The templates / scripts are executed in a sequence of 3 steps. At the end of step 3 we get a Virtual Single node HCI cluster which is registed to Azure. Additionaly we get control plane and workload AKS clusters created on the HCI cluster, and registered as Kubernetes Azure Arc Clusters.
 
 ## Overview of steps
 
@@ -46,21 +46,37 @@ After required modifications have been made to config.txt file, execute the OneN
     ```powershell
     & .\OneNode.ps1
     ```
+
     In the step where the service principal gets created, you will need to login in to your Azure Subscript once, after which the service principal is appended to the config.txt and used from there in the subsequent steps. Manual intervention is also need to confirm the nested VM restart, however you **do not** need to execute the script manually again
 
-    The script generates files like .kube/config on the node, and you can directly fire kubectl commands from the powershell session once th script execution has completed. It is also worth noting that the script generates the file ArcServiceToken.txtm which contains the token if you want to manage your kubernetes workloads from Azure (Adding Arc token in Azure)
+    The script generates files like .kube/config on the node, and you can directly fire kubectl commands from the powershell session once th script execution has completed. It is also worth noting that the script generates the file **ArcServiceToken.txt** which contains the token if you want to manage your kubernetes workloads from Azure (Adding Arc token in Azure)
 
 ### Accessing HCI cluster from Windows Admin Center
 
-* The cluster name to be added in the hosts file will be in the form clusterName.domain, so with default settings the entry in the hosts file will be "192.168.0.4 OneNodeM5Clu.contoso.com".
+Microsoft Edge and Windows Admin Center (WAC) are already installed on the Azure VM. In order to manage the Azure Stack HCI cluster from Admin center, you need to create an entry in the Azure VMs host file for the cluster, in the form clusterName.domain, so with default settings the entry in the hosts file should be "192.168.0.4 OneNodeM5Clu.contoso.com".
 
-### Connecting with the Azure resources
+Once this entry has been made, open WAC. To do this open edge and navigate to https://azshcihost001. Next click on Add and then on Server cluster. Next enter the name of the HCI Cluster **OneNodeM5Clu.contoso.com**. You will be asked add the username (Administrator) and password (from step 2), do that, and with that you should now be able to manage the HCI cluster. Following are some of the screen shots:
+
+*  HCI Cluster VMs: ![HCI Cluster VMs](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/diagrams/wac-list-cluster-vms.png)
+*  HCI Manage AKS cluster: ![HCI Workload AKS cluster](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/diagrams/wac-list-aks-cluster.png)
+   
+   As we can see 6 HCI VMs are created for the control plane and workload AKS clusters
 
 ### Adding Arc token in Azure
 
+If you navigate to the Azure resource group (based on subscription id, and resource group you provided in step 3), and you should see several resources under it, including Azure Stack HCI, Kubernetes Azure Arc clusters (control plane and workload clusters). Navigate to the workload AKS cluster. If you then navigate to workloads under resources you are asked to enter the Arc Token. You can get the token from the ArcServiceToken.txt file (see step 3). After you add the token, all resource section links including workloads, namespaces, etc will start working. Some screenshorts
 
+* Resource group resources: ![Azure Resources](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/diagrams/azure-rg-resources.png)
+* Adding Arc token: ![Adding Arc token](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/diagrams/workload-cluster-add-token-azure.png)
 
-### Get Started with Step 1: Deploy to Azure ##
+After this we can even connect to the Kubernetes cluster locally using the Arc token. The command below creates a proxy and a corresponding entry in your local kube config file, after which you will be able to run kubectl commands against the Arc workload cluster.
+
+```bash
+# you will need to modify the RG name based on your configuration in config.txt
+az connectedk8s proxy -n aks-workload-cluster -g OneNodeM5Rg --token $tok
+```
+
+## Get Started with Step 1: Deploy to Azure
 
 [![Deploy to Azure](https://aka.ms/deploytoazurebutton)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FmaniSbindra%2FAzStackHCISandbox%2Fmain%2Fjson%2Fazuredeploy.json)
 
