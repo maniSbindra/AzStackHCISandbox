@@ -43,7 +43,7 @@ It is also useful to have a look at the progress.log file, which shows the seque
 
 After required modifications have been made to config.txt file, execute the OneNode.ps1 script as follows
 
-    ```powershell
+    ```
     & .\OneNode.ps1
     ```
 
