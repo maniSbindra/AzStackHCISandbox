@@ -49,6 +49,8 @@ After required modifications have been made to config.txt file, execute the OneN
 
 In the step where the service principal gets created, you will need to login in to your Azure Subscript once, after which the service principal is appended to the config.txt and used from there in the subsequent steps. Manual intervention is also need to confirm the nested VM restart, however you **do not** need to execute the script manually again
 
+This step takes around an hour to complete, this is mainly due to the InstallAksHci, which requires multiple HCI VMs to spin up for the AKS nodes.
+
 The script generates files like .kube/config on the node, and you can directly fire kubectl commands from the powershell session once th script execution has completed. It is also worth noting that the script generates the file **ArcServiceToken.txt** which contains the token if you want to manage your kubernetes workloads from Azure (see Adding Arc token in Azure section)
 
 ### Accessing HCI cluster from Windows Admin Center
