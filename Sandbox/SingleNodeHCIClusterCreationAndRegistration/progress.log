@@ -23,6 +23,5 @@ GenerateAksBearerToken = Pending
 EnableArcK8sFeatures = Pending
 AddArcK8sExtensions = Pending
 CreateArcCustomLocation = Pending
-CreateArcDataController = Pending
 DisableAutorun = Pending
 Done
