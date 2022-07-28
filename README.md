@@ -10,15 +10,23 @@ The templates / scripts are executed in a series of 3 steps. At the end of step 
 ![Overview of Steps](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/diagrams/steps-overview.png)
 
 
-Step 1 creates the Azure resources including the Azure VM with Windows Server 2019, Hyper-V, and DHCP server.  Step 2 creates a nested Hyper-V VM with HCI OS, Hyper-V, and sets up the properties, disks and networking needed for Step 3. Step 3 does the creation and registration of the Azure Stack HCI cluster, and AKS clusters (control plane and workload clusters) on top of the Azure Stack HCI cluster.
+Step 1 creates the Azure resources including the Azure VM with Windows Server 2019, Hyper-V, and DHCP server.  Step 2 creates a nested Hyper-V VM with HCI OS, Hyper-V, and sets up the properties, disks and networking needed for Step 3. Step 3 does the creation and registration of the Azure Stack HCI cluster, followed by the creation of control plane and workload AKS clusters (on the Azure Stack HCI), along with their Azure Registration.
 
-## Step Details (WIP)
+## Details of Steps (WIP)
+
+### Step 1
 
 * Go to the Root of this repo, click on deploy to Azure, add value of required parameters, and start the deployment.    This will create an Azure VM will all required windows features enabled and prequisites created to setup nested HCI VM. This step will take over 30 minutes
+  
+### Step 2
+
 * Once the VM is created, RDP into the VM, and execute the powershell script [New-AzSHCISandbox.ps1](./Sandbox/New-AzSHCISandbox.ps1) using the desktop shortcut. This script creates the required network switches, volumes, and creates the nested node with HCI OS, and windows features like HyperV enabled. This step will take around 20 minutes to complete.
   * You may choose to modify some configuration values prior to executing this script. This script and its configuration file AzSHCISandbox-Config.psd1 are located at the path **C:\AzHCI_Sandbox\AzSHCISandbox-main** . Some of these configurations include:
     * NestedVMMemoryinGB: This is the RAM that will be allocated to the HCI cluster node. The minimum recommended value for this is 64GB. By default this value is set to 80GB
     * SDNDomainFQDN: This is the domain suffix which will get associated with the HCI cluster node. By default this is set to "contoso.com"
+  
+### Step 3
+
 * Next we need to get a powershell session into the nested VM, and create a copy of the [config.txt](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/config.txt), [progress.log](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/progress.log) and [OneNode.ps1](./Sandbox/SingleNodeHCIClusterCreationAndRegistration/OneNode.ps1) files in the nested VM. You will need to have a look at the configurations in the config.txt file and modify as appropriate. Overview of configuration values can be found [here](https://github.com/microsoft/onenode-edge-poc/blob/Adding-Domain-Version/OneNode-NoDomain-Readme/OneNode-NoDomain.md#step-2-set-up-the-deployment-tool). Some key configuration values which you should consider modifying are : 
   * 
   * 
